@@ -19,9 +19,9 @@ def getBancas (zipname):
 
 
 # extrair PARTICIPACAO-EM-BANCA-TRABALHOS-CONCLUSAO
-    ap = soup.find_all('participacao-em-trabalhos-conclusão')
+    part_traba_c = soup.find_all('participacao-em-trabalhos-conclusão')
 # VERIFICANDO se ha participacao
-    if len(ap) == 0:
+    if len(part_traba_c) == 0:
         print('participacao em bancas de trabalhos de conclusão não encontrada para:', zipname)
     else:
         ls_dados_part = []
@@ -33,38 +33,58 @@ def getBancas (zipname):
         ls_idioma_banca = []
         ls_part_banca = []
         ls_ordem =[]
-        ls_nome_cita = []
-        ls_nro =[]
+        ls_nome_banca= []
+        
 
-        for i in range(len(ap)):
-            #PARTICIPANTE-BANCA
-            app = ap[i].find_all('participante-banca')
-            if len(app) == 0:
-                print('participante em banca nao encontrado',zipname)
+        for i in range(len(part_traba_c)):
+            #PARTICIPACAO-EM-BANCA-DE-MESTRADO
+            part_bancas = part_traba_c[i].find_all('participacao-em-banca-de-mestrado')
+            if len(part_bancas) == 0:
+                print('participante em banca de mestrado nao encontrado',zipname)
             else: #DADOS-BASICOS-DA-PARTICIPACAO-EM-BANCA-DE-GRADUACAO
-                for j in range(len(app)):
-                    ptb = app[j].find_all('dados-basicos-da-participacao-em-bancas-de-graduacao')
+                for j in range(len(part_bancas)):
+                    ptb = part_bancas[j].find_all('dados-basicos-da-participacao-em-bancas-de-graduacao-de-mestrado')
                     #definindo ano inicial???
                     for k in range(len(ptb)):
-                        banca = str(ptb[k])
-                        result = re.search('ano=\"(.*)\"pais',banca)
+                        dadosbanca = str(ptb[k])
+                        result = re.search('natureza=\"(.*)\"tipo',dadosbanca)
                         cc = fun_result(result)
-                        ls_year_banca.append(cc)
+                        ls_natu_banca.append(cc)
+                        #print (ls_natu_banca)
 
+                        result = re.search('titulo=\"(.*)\"ano',dadosbanca)
+                        cc = fun_result(result)
+                        ls_title_banca.append(cc)
+
+                        result = re.search('pais=\"(.*)\"idioma',dadosbanca)
+                        cc = fun_result(result)
+                        ls_pais_banca.append(cc)
+                        
                         
 
-                        #participantes da banca
-                        ep = ptb[k].find_all('participante-banca')
-                        for m in range(len(ep)):
-                            ip = ep[m].find_all('participante-banca')
-                            ls_part_banca = []
-                            ls_nome_cita = []
-                            for m in range(len(ip)):
-                                partic = str(ip[m])
-                                result = re.search('nome-completo-partcipante-da-banca=\"(.*)\" nome-para-citacao-do-participante-da-banca',partic)
-                                cc = fun_result(result)
-                                ls_part_banca.append(cc)
-                                ls_nome_cita.append(cc)
+                        #detalhe participantes da banca
+                        #DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO
+                        detalhe_banca = part_bancas[i].find_all(
+                            'detalhamento-da-participacao-em-banca-de-mestrado')
+                        detalhe_banca = str(detalhe_banca)
+
+#<DETALHAMENTO-DA-PARTICIPACAO-EM-BANCA-DE-MESTRADO 
+# NOME-DO-CANDIDATO="Marielle Albuquerque Azoubel" 
+#CODIGO-INSTITUICAO="002100000009" NOME-INSTITUICAO="Universidade Federal de Pernambuco"
+# CODIGO-ORGAO="" NOME-ORGAO="" CODIGO-CURSO="60054131" 
+# NOME-CURSO="Educação Matemática e Tecnológica" NOME-CURSO-INGLES=""/>
+
+                        #nome-do-candidato
+                        result = re.search('nome-do-candidato=\"(.*)\"nome-instituicao',
+                        detalhe_banca)
+                        cc = fun_result(result)
+                        ls_nome_banca(cc)
+
+                        result = re.search('')
+
+
+
+
 
         #dataFrame para dados
         df_ptb = pd.DataFrame({
